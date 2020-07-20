@@ -1,9 +1,57 @@
 var express = require('express');
 var router = express.Router();
 var conn = require("../conexion/conn");
-/* GET users listing. */
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const { isNullOrUndefined } = require('util');
+//-------- Authentication ----------
+router.post('/register',(req, res) => {
+  try {
+    const {username, password, name, email, phone} = req.body;
+    if(username && password && name && email && phone){
+      var passwordHash = crypto.createHash('sha256').update(password).digest('base64');
+      conn.query("INSERT INTO users (username, password, name, email, phone) VALUES ('"
+      +username+"','"
+      +passwordHash+"','"
+      +name+"','"
+      +email+"','"
+      +phone+"');",
+      (err, result)=>{
+        if (!isNullOrUndefined(result[0])) {
+          res.status(200).send("Usuario agregado.");
+        }else{res.status(401).send("El usuario no existe.");}
+      });
+    }else{res.status(401).send("Campos vacios.")}
+  } catch (error) {
+    res.status(500).send(error)
+  }
+  });
 
-router.get('/', function(req, res, next) {
+  router.post('/login', (req, res) => {
+  try {
+    const {username, password } = req.body;
+    if(username && password){
+      var passwordHash = crypto.createHash('sha256').update(password).digest('base64');
+      conn.query("SELECT * FROM users where username = '"+username+"' and password = '"+passwordHash+"';", (err, result)=>{
+        if(!isNullOrUndefined(result[0])){
+          const token = jwt.sign({_id:result[0].idusers}, 'secretKey');
+          res.status(200).send({'token':token});
+        }else{
+          res.status(401).send("El usuario no existe.")
+        }
+        if(!isNullOrUndefined(err)){
+          res.status(500).send(err);
+        }
+      });
+    }else{res.status(401).send("Los campos estan vacios.")}
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error)
+  }
+  });
+
+//------------ CRUD ------------------
+router.get('/', verifyToken ,function(req, res, next) {
  try {
   conn.query("SELECT * FROM productos", (err, result) =>{
     res.json(result);
@@ -13,7 +61,7 @@ router.get('/', function(req, res, next) {
  }
 });
 
-router.get('/GetProduct/:id', function(req, res, next) {
+router.get('/GetProduct/:id', verifyToken ,function(req, res, next) {
   try {
     const {id} = req.params;
     conn.query("SELECT * FROM productos where ID = '"+id+"';", (err, result) =>{
@@ -24,7 +72,7 @@ router.get('/GetProduct/:id', function(req, res, next) {
   }
 });
 
-router.post('/',(req, res) => {
+router.post('/', verifyToken ,(req, res) => {
 try {
   const {title, imagen, descripcion, precio} = req.body;
   if(title && imagen && descripcion && precio){
@@ -37,7 +85,8 @@ try {
 }
 });
 
-router.delete('/:id',(req, res) => {
+
+router.delete('/:id', verifyToken ,(req, res) => {
   try {
     const { id } = req.params;
     if(id != null){
@@ -50,7 +99,7 @@ router.delete('/:id',(req, res) => {
   }
 });
 
-router.put('/:id',(req, res) => {
+router.put('/:id',verifyToken ,(req, res) => {
   try {
     const { id } = req.params;
     const { title, imagen, descripcion, precio } = req.body;
@@ -65,3 +114,19 @@ router.put('/:id',(req, res) => {
 });
 
 module.exports = router;
+
+//Validacion de token.
+function verifyToken(req, res, next){
+  if (!req.headers.authorization) {
+    return res.status(401).send("Acceso denegado.");
+  }
+
+  const token = req.headers.authorization.split(' ')[1];
+  if (token === 'null') {
+    return req.status(401).send("Acceso denegado.")
+  }
+
+  const payload = jwt.verify(token, 'secretKey');
+  req.userId = payload._id;
+  next();
+}

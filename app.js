@@ -3,11 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/api');
+const cors = require('cors');
 
 var app = express();
+app.use(cors({ origin: true }));
 app.set('port', process.env.PORT || 3000);
 app.set('json spaces', 2);
 // view engine setup
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/', indexRouter);
 app.use('/api', usersRouter);
