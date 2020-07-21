@@ -3,23 +3,27 @@ var router = express.Router();
 var conn = require("../conexion/conn");
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const uniqid = require('uniqid');
 const { isNullOrUndefined } = require('util');
+const { count } = require('console');
 //-------- Authentication ----------
-router.post('/register',(req, res) => {
+router.post('/register', verifyExistUser, (req, res) => {
   try {
     const {username, password, name, email, phone} = req.body;
     if(username && password && name && email && phone){
+      var id = uniqid();
       var passwordHash = crypto.createHash('sha256').update(password).digest('base64');
-      conn.query("INSERT INTO users (username, password, name, email, phone) VALUES ('"
+      conn.query("INSERT INTO users (iduser, username, password, name, email, phone) VALUES ('"
+      +id+"','"
       +username+"','"
       +passwordHash+"','"
       +name+"','"
       +email+"','"
       +phone+"');",
       (err, result)=>{
-        if (!isNullOrUndefined(result[0])) {
-          res.status(200).send("Usuario agregado.");
-        }else{res.status(401).send("El usuario no existe.");}
+        if (isNullOrUndefined(result[0])) {
+          res.status(200).send({'message':'Usuario registrado.'});
+        }else{res.status(401).send("Hubo un problema con los datos.");}
       });
     }else{res.status(401).send("Campos vacios.")}
   } catch (error) {
@@ -29,17 +33,17 @@ router.post('/register',(req, res) => {
 
   router.post('/login', (req, res) => {
   try {
-    const {username, password } = req.body;
+    const { username, password } = req.body;
     if(username && password){
       var passwordHash = crypto.createHash('sha256').update(password).digest('base64');
       conn.query("SELECT * FROM users where username = '"+username+"' and password = '"+passwordHash+"';", (err, result)=>{
         if(!isNullOrUndefined(result[0])){
-          const token = jwt.sign({_id:result[0].idusers}, 'secretKey');
+          const token = jwt.sign({_id:result[0].iduser}, 'secretKey');
           res.status(200).send({'token':token});
         }else{
-          res.status(401).send("El usuario no existe.")
+          res.status(401).send({'message':'Usuario no registrado.'})
         }
-        if(!isNullOrUndefined(err)){
+        if(isNullOrUndefined(err)){
           res.status(500).send(err);
         }
       });
@@ -114,6 +118,20 @@ router.put('/:id',verifyToken ,(req, res) => {
 });
 
 module.exports = router;
+
+//Verificacion de usuario existente.
+function verifyExistUser(req, res, next) {
+  const { username , email } = req.body;
+  conn.query("SELECT * FROM heroku_e12b52604cab367.users where users.username = '"
+  +username+"' and users.email = '"
+  +email+"';", (err, result)=>{
+    if(!isNullOrUndefined(result[0])){
+      res.status(401).send({'message':"El correo:"+result[0].email+" y el usuario:"+username+" ya existen."})
+    }else{
+      next();
+    }
+  });
+}
 
 //Validacion de token.
 function verifyToken(req, res, next){

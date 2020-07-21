@@ -8,7 +8,7 @@ var usersRouter = require('./routes/api');
 const cors = require('cors');
 
 var app = express();
-app.use(cors({ origin: true }));
+
 app.set('port', process.env.PORT || 3000);
 app.set('json spaces', 2);
 // view engine setup
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cors({ origin: true }));
 
 app.use('/', indexRouter);
 app.use('/api', usersRouter);
