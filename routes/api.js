@@ -5,7 +5,6 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const uniqid = require('uniqid');
 const { isNullOrUndefined } = require('util');
-const { count } = require('console');
 //-------- Authentication ----------
 router.post('/register', verifyExistUser, (req, res) => {
   try {
@@ -39,12 +38,15 @@ router.post('/register', verifyExistUser, (req, res) => {
       conn.query("SELECT * FROM users where username = '"+username+"' and password = '"+passwordHash+"';", (err, result)=>{
         if(!isNullOrUndefined(result[0])){
           const token = jwt.sign({_id:result[0].iduser}, 'secretKey');
-          res.status(200).send({'token':token});
+          res.status(200).send({
+            'token':token,
+            'username':result[0].username,
+            'name':result[0].name,
+            'email':result[0].email,
+            'phone':result[0].phone
+          });
         }else{
           res.status(401).send({'message':'Usuario no registrado.'})
-        }
-        if(isNullOrUndefined(err)){
-          res.status(500).send(err);
         }
       });
     }else{res.status(401).send("Los campos estan vacios.")}
@@ -55,7 +57,7 @@ router.post('/register', verifyExistUser, (req, res) => {
   });
 
 //------------ CRUD ------------------
-router.get('/', verifyToken ,function(req, res, next) {
+router.get('/' ,function(req, res, next) {
  try {
   conn.query("SELECT * FROM productos", (err, result) =>{
     res.json(result);
@@ -140,7 +142,7 @@ function verifyToken(req, res, next){
   }
 
   const token = req.headers.authorization.split(' ')[1];
-  if (token === 'null') {
+  if (token === 'null' || token === 'undefined') {
     return req.status(401).send("Acceso denegado.")
   }
 
