@@ -22,9 +22,9 @@ router.post('/register', verifyExistUser, (req, res) => {
       (err, result)=>{
         if (isNullOrUndefined(result[0])) {
           res.status(200).send({'message':'Usuario registrado.'});
-        }else{res.status(401).send("Hubo un problema con los datos.");}
+        }else{res.status(401).send({'message':err});}
       });
-    }else{res.status(401).send("Campos vacios.")}
+    }else{res.status(401).send({'message':"Campos vacios."})}
   } catch (error) {
     res.status(500).send(error)
   }
@@ -63,18 +63,18 @@ router.get('/' ,function(req, res, next) {
     res.json(result);
   });
  } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({'message':error});
  }
 });
 
-router.get('/GetProduct/:id', verifyToken ,function(req, res, next) {
+router.get('/GetProduct/:id' ,function(req, res, next) {
   try {
     const {id} = req.params;
     conn.query("SELECT * FROM productos where ID = '"+id+"';", (err, result) =>{
       res.json(result);
     });
   } catch (error) {
-    res.send(error);
+    res.send({'message':error});
   }
 });
 
@@ -83,11 +83,11 @@ try {
   const {title, imagen, descripcion, precio} = req.body;
   if(title && imagen && descripcion && precio){
     conn.query("INSERT INTO productos (ID, titulo, imagen, descripcion, precio) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"');", (err, result)=>{
-      res.status(200).send("Producto agregado");
+      res.status(200).send({'message':"Producto agregado"});
     });
-  }else{res.status(500).send("Producto rechazado")}
+  }else{res.status(500).send({'message':"Producto rechazado"})}
 } catch (error) {
-  res.status(500).send(error)
+  res.status(500).send({'message':error})
 }
 });
 
@@ -97,11 +97,11 @@ router.delete('/:id', verifyToken ,(req, res) => {
     const { id } = req.params;
     if(id != null){
       conn.query("DELETE FROM productos WHERE '"+id+"'", (err, result)=>{
-        res.status(200).send("Producto eliminado");
+        res.status(200).send({'message':"Producto eliminado"});
       });
-    }else{res.status(500).send()}
+    }else{res.status(500).send({'message':'Producto no eliminado'})}
   } catch (error) {
-    res.status(500).send(error)
+    res.status(500).send({'message':error})
   }
 });
 
@@ -111,11 +111,11 @@ router.put('/:id',verifyToken ,(req, res) => {
     const { title, imagen, descripcion, precio } = req.body;
     if(title && imagen && descripcion && precio && id){
       conn.query("UPDATE productos SET titulo = '"+title+"', imagen = '"+imagen+"', descripcion = '"+descripcion+"', precio = '"+precio+"' WHERE ID = '"+id+"';", (err, result)=>{
-        res.status(200).send(result);
+        res.status(200).send({'message':'Producto modificado'})
       });
-    }else{res.status(500).send()}
+    }else{res.status(500).send({'message':'Producto no modificado'})}
   } catch (error) {
-    res.status(500).send(error)
+    res.status(500).send({'message':error})
   }
 });
 
