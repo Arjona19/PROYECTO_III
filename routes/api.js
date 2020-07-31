@@ -80,7 +80,7 @@ router.post('/register', verifyExistUser, (req, res) => {
 //------------ CRUD ------------------
 router.get('/' ,function(req, res, next) {
  try {
-  conn.query("SELECT * FROM productos", (err, result) =>{
+  conn.query("SELECT * FROM heroku_e12b52604cab367.productos", (err, result) =>{
     res.json(result);
   });
  } catch (error) {
@@ -91,7 +91,7 @@ router.get('/' ,function(req, res, next) {
 router.get('/GetProduct/:id', function(req, res, next) {
   try {
     const {id} = req.params;
-    conn.query("SELECT * FROM productos where ID = '"+ id +"';", (err, result) =>{
+    conn.query("SELECT * FROM heroku_e12b52604cab367.productos where ID = '"+ id +"';", (err, result) =>{
       res.json(result);
     });
   } catch (error) {
@@ -113,9 +113,9 @@ router.get('/GetProduct/:id', verifyToken ,function(req, res, next) {
 */
 router.post('/', verifyToken ,(req, res) => {
 try {
-  const {title, imagen, descripcion, precio} = req.body;
-  if(title && imagen && descripcion && precio){
-    conn.query("INSERT INTO productos (ID, titulo, imagen, descripcion, precio) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"');", (err, result)=>{
+  const {title, imagen, descripcion, precio, autor, tecnologia} = req.body;
+  if(title && imagen && descripcion && precio && autor && tecnologia){
+    conn.query("INSERT INTO heroku_e12b52604cab367.productos (ID, titulo, imagen, descripcion, precio, autor, tecnologia) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"', '"+autor+"', '"+tecnologia+"');", (err, result)=>{
       res.status(200).send("Producto agregado");
     });
   }else{res.status(500).send("Producto rechazado")}
@@ -129,7 +129,7 @@ router.delete('/:id', verifyToken ,(req, res) => {
   try {
     const { id } = req.params;
     if(id != null){
-      conn.query("DELETE FROM productos WHERE '"+id+"'", (err, result)=>{
+      conn.query("DELETE FROM heroku_e12b52604cab367.productos WHERE ID = '"+id+"'", (err, result)=>{
         res.status(200).send("Producto eliminado");
       });
     }else{res.status(500).send()}
@@ -141,9 +141,9 @@ router.delete('/:id', verifyToken ,(req, res) => {
 router.put('/:id',verifyToken ,(req, res) => {
   try {
     const { id } = req.params;
-    const { title, imagen, descripcion, precio } = req.body;
-    if(title && imagen && descripcion && precio && id){
-      conn.query("UPDATE productos SET titulo = '"+title+"', imagen = '"+imagen+"', descripcion = '"+descripcion+"', precio = '"+precio+"' WHERE ID = '"+id+"';", (err, result)=>{
+    const { title, imagen, descripcion, precio, autor, tecnologia} = req.body;
+    if(title && imagen && descripcion && precio && id && autor && tecnologia){
+      conn.query("UPDATE heroku_e12b52604cab367.productos SET titulo = '"+title+"', imagen = '"+imagen+"', descripcion = '"+descripcion+"', precio = '"+precio+"', autor = '"+autor+"', tecnologia = '"+tecnologia+"' WHERE ID = '"+id+"';", (err, result)=>{
         res.status(200).send(result);
       });
     }else{res.status(500).send()}
@@ -204,6 +204,11 @@ router.get('/pay/:total', function(req, res){
 router.get('/process', function(req, res){
   var paymentId = req.query.paymentId;
   var payerId = { 'payer_id': req.query.PayerID };
+
+  conn.query("INSERT INTO heroku_e12b52604cab367.ventas (ID, ClaveTransaccion, ClaveComprador, Fecha) VALUES (NULL, '"+ paymentId +"', '"+payerId+"', CURDATE());", (err, result) =>{
+   //res.json(result);
+  });
+
 
   paypal.payment.execute(paymentId, payerId, function(error, payment){
       if(error){
