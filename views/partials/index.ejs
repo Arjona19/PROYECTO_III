@@ -1,0 +1,78 @@
+<%- include ../layouts/header.ejs %>
+
+<div class="content-wrapper">
+  
+  <div class="container">    
+    <a href="/NewProduct" class="btn btn-success btn-rounded mb-4">Agregar nuevo producto</a>
+    <div class="row">
+      
+      <% for(var i =0; i < data.length;i++){ %>
+      <div class="col-6 col-md-6">
+        <div class="card mb-4" style="max-width: 540px;">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="../../assets/images/portadas/<%= data[i].imagen %>" class="card-img h-100" alt="...">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title"><%= data[i].titulo %></h5>
+                <p class="card-text"><%= data[i].descripcion %></p>
+                <h4>
+                  <span class="badge badge-pill badge-info">
+                    <i class="mdi mdi-account-circle-outline"></i>
+                    <%= data[i].autor %>
+                  </span>
+                </h3>
+                <h4>
+                  <span class="badge badge-pill badge-danger">
+                    <i class="mdi mdi-code-tags"></i>
+                    <%= data[i].tecnologia %>
+                  </span>
+                </h3>
+              </div>
+              <div class="card-body">
+                <form action="/show/<%= data[i].ID %>" method="post">
+                  <button type="submit" data-toggle="tooltip" data-placement="bottom" title="Editar manual" class="btn btn-icons btn-rounded btn-outline-info">
+                    <i class="mdi mdi-pencil-outline"></i>
+                  </button>
+                  <button type="button" data-toggle="modal" data-target="#exampleModal_<%= i %>" data-toggle="tooltip" data-placement="bottom" title="Eliminar manual" class="btn btn-icons btn-rounded btn-outline-danger">
+                    <i class="mdi mdi-delete"></i>
+                  </button>      
+                  <button type="button" data-toggle="tooltip" data-placement="bottom" title="Abrir manual" class="btn btn-icons btn-rounded btn-outline-success">
+                    <i class="mdi mdi-paperclip"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="exampleModal_<%= i %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel"><%= data[i].titulo %></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Estas seguro de eliminar ?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              <form action="/delete/<%= data[i].ID %>" method="post">
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+        <% } %>
+    </div>
+  </div>
+  
+
+</div>
+
+<%- include ../layouts/footer.ejs %>

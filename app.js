@@ -3,22 +3,22 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/api');
-
+var loginRouter = require('./routes/login');
+var manualesRouter = require('./routes/manuales');
+var ventasRouter = require('./routes/ventas');
+var apiRouter = require('./routes/api');
+const session = require('express-session');
 const cors = require('cors');
 
 var app = express();
-
+app.use(session({
+  secret: 'secretKey',
+  resave: true,
+  saveUninitialized: true
+}));
 //-------------- paypay
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
-
-
-
-
-
-
 
 app.set('port', process.env.PORT || 3000);
 app.set('json spaces', 2);
@@ -33,8 +33,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors({ origin: true }));
 
-app.use('/', indexRouter);
-app.use('/api', usersRouter);
+app.use('/', manualesRouter);
+app.use('/ventas', ventasRouter);
+app.use('/login', loginRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,0 +1,55 @@
+<%- include ../layouts/header.ejs %>
+
+<div class="content-wrapper">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Nuevo producto</h4>
+              <form action="/" method="POST" enctype="multipart/form-data">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="inputEmail4">Nombre</label>
+                    <input type="text" name="title" class="form-control" id="inputEmail4">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="inputZip">Selecciona la portada y el archivo zip</label>
+                    <input type="file" id="file" multiple name="archivos" style="display:none;" />
+                    <button id="inputZip" onclick="thisFileUpload();" type="button" class="btn btn-outline-info btn-fw form-control">                    
+                        <i class="mdi mdi-upload"></i>
+                        Upload
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlTextarea1">Descripción</label>
+                    <textarea class="form-control" name="descripcion" id="exampleFormControlTextarea1" rows="3"></textarea>
+                  </div>
+                <div class="form-row">
+                  <div class="form-group col-md-3">
+                    <label for="inputCity">Precio</label>
+                    <input type="number" name="precio" min="0" type="text" class="form-control" id="inputCity">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="inputCity">Autor</label>
+                    <input type="text" name="autor" class="form-control" id="inputCity">
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="inputCity">Tecnologia</label>
+                    <input type="text" name="tecnologia" class="form-control" id="inputCity">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success">Agregar</button>
+                <a href="/" class="btn btn-default">Cancelar</button>
+              </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<script>
+    function thisFileUpload() {
+        document.getElementById("file").click();
+    };
+</script>
+<%- include ../layouts/footer.ejs %>

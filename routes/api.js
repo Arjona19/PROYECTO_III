@@ -86,6 +86,7 @@ router.post('/register', verifyExistUser, (req, res) => {
       conn.query("SELECT * FROM users where username = '"+username+"' and password = '"+passwordHash+"';", (err, result)=>{
         if(!isNullOrUndefined(result[0])){
           const token = jwt.sign({_id:result[0].iduser}, 'secretKey');
+
           res.status(200).send({
             'iduser':result[0].iduser,
             'token':token,
@@ -94,6 +95,7 @@ router.post('/register', verifyExistUser, (req, res) => {
             'email':result[0].email,
             'phone':result[0].phone
           });
+          
         }else{
           res.status(401).send({'message':'Usuario no registrado.'})
         }
@@ -379,21 +381,6 @@ function verifyExistUser(req, res, next) {
     }
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //Validacion de token.
