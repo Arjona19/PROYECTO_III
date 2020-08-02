@@ -50,6 +50,34 @@ router.post('/register', verifyExistUser, (req, res) => {
   }
   });
 
+
+  router.get('/user/:iduser', function(req, res, next) {
+    try {
+      const {iduser} = req.params;
+      conn.query("SELECT * FROM heroku_e12b52604cab367.users where iduser = '"+ iduser +"';", (err, result) =>{
+        res.json(result);
+      });
+    } catch (error) {
+      res.send(error);
+    }
+  });
+
+  router.post('user/:iduser' ,(req, res) => {
+    try {
+      const { iduser } = req.params;
+      const { username, name, email, phone} = req.body;
+      if(username && name && email && phone){
+        console.log('d');
+        conn.query("UPDATE users SET username = '"+username+"', name = '"+name+"', email = '"+email+"', phone = '"+phone+"' WHERE iduser = '"+iduser+"';", (err, result)=>{
+          res.status(200).send(result);
+        });
+      }else{res.status(500).send()}
+    } catch (error) {
+      res.status(500).send(error)
+    }
+  });
+  
+
   router.post('/login', (req, res) => {
   try {
     const { username, password } = req.body;
@@ -182,6 +210,7 @@ router.get('/pay/:total', function(req, res){
       } else {
           //capture HATEOAS links
           var links = {};
+          console.log(payment);
           payment.links.forEach(function(linkObj){
               links[linkObj.rel] = {
                   'href': linkObj.href,
@@ -203,6 +232,7 @@ router.get('/pay/:total', function(req, res){
 
 router.get('/process', function(req, res){
   var paymentId = req.query.paymentId;
+  console.log(req.query);
   var payerId = { 'payer_id': req.query.PayerID };
 
   conn.query("INSERT INTO heroku_e12b52604cab367.ventas (ID, ClaveTransaccion, ClaveComprador, Fecha) VALUES (NULL, '"+ paymentId +"', '"+payerId+"', CURDATE());", (err, result) =>{
@@ -216,13 +246,26 @@ router.get('/process', function(req, res){
       } else {
           if (payment.state == 'approved'){ 
               //res.send('payment completed successfully');
-              res.redirect('http://localhost:3001/');
+              res.redirect('http://localhost:3001/paypal-page');
           } else {
               res.send('payment not successful');
           }
       }
   });
 });
+
+
+
+router.get('/prueba', ()=> {
+
+  paypal.payment.get('PAYID-L4SFH2Q1DV244733L834203B',function(error, payment){
+    console.log(payment);
+    //res.send(payment);
+  });
+
+
+});
+
 
 router.get('/cancel', ()=> res.send('cancelado'));
 
