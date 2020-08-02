@@ -62,7 +62,7 @@ router.post('/register', verifyExistUser, (req, res) => {
     }
   });
 
-  router.post('user/:iduser' ,(req, res) => {
+  router.put('user/:iduser' ,(req, res) => {
     try {
       const { iduser } = req.params;
       const { username, name, email, phone} = req.body;
@@ -181,6 +181,92 @@ router.put('/:id',verifyToken ,(req, res) => {
 });
 
 
+router.post('/pay' ,(req, res) => {
+  try {
+    const data = {userId, products, total} = req.body;
+    console.log(data);
+
+    if(data.userId && data.products && data.total){
+
+      var payReq = JSON.stringify({
+        'intent':'sale',
+        'redirect_urls':{
+            'return_url':'http://localhost:3000/api/process',
+            'cancel_url':'http://localhost:3000/api/cancel'
+        },
+        'payer':{
+            'payment_method':'paypal'
+        },
+        'transactions':[{
+            'amount':{
+                'total': total,
+                'currency':'MXN'
+            },
+            'description':'Compra de manuales - DevLoopers'
+        }]
+      });
+
+      paypal.payment.create(payReq, function(error, payment){
+        if(error){
+            console.error(error);
+        } else {
+
+          let claveTransaccionPaypal = payment.id;
+          let claveCompradorPaypal = "none";
+          let estadoPaypal = "NotApproved";
+          let userId = JSON.parse(data.userId);
+          let total = data.total;
+
+          conn.query("INSERT INTO heroku_e12b52604cab367.ventasmaster (ventaMasterId, usuarioId, fecha, total, claveTransaccionPaypal, claveCompradorPaypal, estadoPaypal) VALUES (NULL,'"+userId+"',CURDATE(), '"+total+"', '"+claveTransaccionPaypal+"', '"+claveCompradorPaypal+"','"+estadoPaypal+"'); ", (err, result) =>{
+            
+            let ventaMasterId  = result.insertId;
+
+            let products = JSON.parse(data.products);
+
+            products.forEach(element => {
+
+              let productId = element.ID;
+
+              conn.query("INSERT INTO heroku_e12b52604cab367.detallesventa (detallesVentaId, ventaMasterId, productoId) VALUES (NULL, '"+ventaMasterId +"', '"+productId+"');", (err, result) =>{
+                console.log('producto_detalleVenta insertado'+ result.insertId);
+              });
+
+            });
+
+          });
+    
+            //capture HATEOAS links
+            var links = {};
+            console.log(payment);
+            payment.links.forEach(function(linkObj){
+                links[linkObj.rel] = {
+                    'href': linkObj.href,
+                    'method': linkObj.method
+                };
+            })
+        
+            //if redirect url present, redirect user
+            if (links.hasOwnProperty('approval_url')){
+                //res.redirect(links['approval_url'].href);
+                
+                res.status(200).send({"paypal_link" : links['approval_url'].href});
+            } else {
+                console.error('no redirect URI present');
+            }
+        }
+      });
+
+    }else{res.status(500).send("Producto rechazado")}
+  } catch (error) {
+    res.status(500).send(error)
+  }
+
+});
+
+
+
+
+/*
 router.get('/pay/:total', function(req, res){
 
   const {total} = req.params;
@@ -230,14 +316,16 @@ router.get('/pay/:total', function(req, res){
   });
 });
 
+*/
+
 router.get('/process', function(req, res){
   var paymentId = req.query.paymentId;
   console.log(req.query);
   var payerId = { 'payer_id': req.query.PayerID };
 
-  conn.query("INSERT INTO heroku_e12b52604cab367.ventas (ID, ClaveTransaccion, ClaveComprador, Fecha) VALUES (NULL, '"+ paymentId +"', '"+payerId+"', CURDATE());", (err, result) =>{
-   //res.json(result);
-  });
+  let claveCompradorPaypal = req.query.PayerID;
+
+  
 
 
   paypal.payment.execute(paymentId, payerId, function(error, payment){
@@ -245,6 +333,13 @@ router.get('/process', function(req, res){
           console.error(error);
       } else {
           if (payment.state == 'approved'){ 
+
+            let estadoPaypal = "Approved";
+
+            conn.query("UPDATE heroku_e12b52604cab367.ventasmaster SET claveCompradorPaypal = '"+claveCompradorPaypal+"', estadoPaypal = '"+estadoPaypal+"' WHERE claveTransaccionPaypal = '"+paymentId+"' ;", (err, result) =>{
+              //res.json(result);
+             });
+
               //res.send('payment completed successfully');
               res.redirect('http://localhost:3001/paypal-page');
           } else {
