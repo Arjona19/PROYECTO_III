@@ -118,7 +118,7 @@ router.get('/' ,function(req, res, next) {
  }
 });
 
-router.get('/GetProduct/:id', function(req, res, next) {
+router.get('/producto/:id', function(req, res, next) {
   try {
     const {id} = req.params;
     conn.query("SELECT * FROM heroku_e12b52604cab367.productos where ID = '"+ id +"';", (err, result) =>{
@@ -128,6 +128,35 @@ router.get('/GetProduct/:id', function(req, res, next) {
     res.send(error);
   }
 });
+
+//-------------------- comentarios-------------
+
+router.get('/comentarios/:productoId', function(req, res, next) {
+  try {
+    const {productoId} = req.params;
+    conn.query("SELECT * FROM heroku_e12b52604cab367.comentarios WHERE productoId = '"+productoId+"';", (err, result) =>{
+      res.json(result);
+    });
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+
+router.post('/comentarios', function(req, res) {
+  try {
+    const {usuarioId, productoId, comentario} = req.body;
+    if(usuarioId && productoId && comentario){
+      conn.query("INSERT INTO heroku_e12b52604cab367.comentarios (comentarioId, comentario, productoId, usuarioId) VALUES (NULL, '"+comentario+"', '"+productoId+"', '"+usuarioId+"');", (err, result)=>{
+        res.status(200).send("comentario agregado");
+      });
+    }else{res.status(500).send("comentario rechazado")}
+  } catch (error) {
+    res.status(500).send(error)
+  }
+  });
+
+
 /*
 router.get('/GetProduct/:id', verifyToken ,function(req, res, next) {
   try {
