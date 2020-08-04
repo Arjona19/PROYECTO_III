@@ -170,7 +170,6 @@ try {
 }
 });
 
-
 router.delete('/:id', verifyToken ,(req, res) => {
   try {
     const { id } = req.params;
@@ -204,6 +203,31 @@ router.post('/getProductSolds', (req, res)=>{
     if(iduser){
       conn.query("call heroku_e12b52604cab367.GetLastSale('"+iduser+"');", (err, result)=>{
         res.send(result);
+      });
+    }else{res.status(500).send()}
+  } catch (error) {
+    res.status(500).send(error)
+  }
+});
+
+router.post('/getAllSolds', (req, res)=>{
+  try {
+    const { iduser } = req.body;
+    if(iduser){
+      conn.query("call heroku_e12b52604cab367.GetAllSolds('"+iduser+"');", (err, result)=>{
+        let array = result[0];
+        let olditem = '';
+        let solds = [];
+        array.forEach(element=>{
+          if (olditem === '') {
+            olditem = element.titulo;
+            solds.push({titulo: element.titulo , archivo:element.archivo});
+          }else if(olditem !== element.titulo){
+            olditem = element.titulo;
+            solds.push({titulo: element.titulo , archivo:element.archivo});
+          }
+        });
+        res.send(solds);
       });
     }else{res.status(500).send()}
   } catch (error) {
