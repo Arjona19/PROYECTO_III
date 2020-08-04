@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors({ origin: true }));
+app.use(cors({ origin: false }));// es que al princio me dio ese error porque no tenia esto
 
 app.use('/', manualesRouter);
 app.use('/ventas', ventasRouter);
