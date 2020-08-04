@@ -134,7 +134,7 @@ router.get('/producto/:id', function(req, res, next) {
 router.get('/comentarios/:productoId', function(req, res, next) {
   try {
     const {productoId} = req.params;
-    conn.query("SELECT * FROM heroku_e12b52604cab367.comentarios WHERE productoId = '"+productoId+"';", (err, result) =>{
+    conn.query("SELECT C.comentario, C.created_at, U.username FROM heroku_e12b52604cab367.comentarios C INNER JOIN users U ON C.usuarioId = U.iduser WHERE productoId = '"+productoId+"';", (err, result) =>{
       res.json(result);
     });
   } catch (error) {
@@ -148,7 +148,8 @@ router.post('/comentarios', function(req, res) {
     const {usuarioId, productoId, comentario} = req.body;
     if(usuarioId && productoId && comentario){
       conn.query("INSERT INTO heroku_e12b52604cab367.comentarios (comentarioId, comentario, productoId, usuarioId) VALUES (NULL, '"+comentario+"', '"+productoId+"', '"+usuarioId+"');", (err, result)=>{
-        res.status(200).send("comentario agregado");
+        //res.status(200).send("comentario agregado");
+        res.json("comentario agregado");
       });
     }else{res.status(500).send("comentario rechazado")}
   } catch (error) {
