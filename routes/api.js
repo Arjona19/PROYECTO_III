@@ -370,6 +370,7 @@ router.get('/download/:archivo', (req, res, next)=>{
 
 router.get('/cancel', ()=> res.send('cancelado'));
 
+
 module.exports = router;
 
 //Verificacion de usuario existente.
