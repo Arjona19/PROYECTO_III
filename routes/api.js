@@ -245,8 +245,8 @@ router.post('/pay' ,(req, res) => {
       var payReq = JSON.stringify({
         'intent':'sale',
         'redirect_urls':{
-            'return_url':'http://localhost:3000/api/process',
-            'cancel_url':'http://localhost:3000/api/cancel'
+            'return_url':'https://dev-loopers.herokuapp.com/api/process',
+            'cancel_url':'https://dev-loopers.herokuapp.com/api/cancel'
         },
         'payer':{
             'payment_method':'paypal'
@@ -339,7 +339,7 @@ router.get('/process', function(req, res){
               //res.json(result);
              });
               //res.send('payment completed successfully');
-              res.redirect('http://localhost:3001/paypal-page');
+              res.redirect('https://dev-loopers-market.herokuapp.com/paypal-page');
           } else {
               res.send('payment not successful');
           }
