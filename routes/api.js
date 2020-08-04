@@ -157,20 +157,6 @@ router.post('/comentarios', function(req, res) {
   }
   });
 
-
-/*
-router.get('/GetProduct/:id', verifyToken ,function(req, res, next) {
-  try {
-    const {id} = req.params;
-    conn.query("SELECT * FROM productos where ID = '"+id+"';", (err, result) =>{
-      res.json(result);
-    });
-  } catch (error) {
-    res.send(error);
-  }
-});
-
-*/
 router.post('/', verifyToken ,(req, res) => {
 try {
   const {title, imagen, descripcion, precio, autor, tecnologia} = req.body;
@@ -212,6 +198,18 @@ router.put('/:id',verifyToken ,(req, res) => {
   }
 });
 
+router.post('/getProductSolds', (req, res)=>{
+  try {
+    const { iduser } = req.body;
+    if(iduser){
+      conn.query("call heroku_e12b52604cab367.GetLastSale('"+iduser+"');", (err, result)=>{
+        res.send(result);
+      });
+    }else{res.status(500).send()}
+  } catch (error) {
+    res.status(500).send(error)
+  }
+});
 
 router.post('/pay' ,(req, res) => {
   try {
@@ -234,7 +232,7 @@ router.post('/pay' ,(req, res) => {
                 'total': total,
                 'currency':'MXN'
             },
-            'description':'Compra de manuales - DevLoopers'
+            'description':'Compra de manuales - DevLoopers: $'+total+'.00 MXN'
         }]
       });
 
@@ -295,61 +293,6 @@ router.post('/pay' ,(req, res) => {
 
 });
 
-
-
-
-/*
-router.get('/pay/:total', function(req, res){
-
-  const {total} = req.params;
-
-  //build PayPal payment request
-  var payReq = JSON.stringify({
-      'intent':'sale',
-      'redirect_urls':{
-          'return_url':'http://localhost:3000/api/process',
-          'cancel_url':'http://localhost:3000/api/cancel'
-      },
-      'payer':{
-          'payment_method':'paypal'
-      },
-      'transactions':[{
-          'amount':{
-              'total': total,
-              'currency':'MXN'
-          },
-          'description':'Compra de manuales - DevLoopers'
-      }]
-  });
-
-  paypal.payment.create(payReq, function(error, payment){
-      if(error){
-          console.error(error);
-      } else {
-          //capture HATEOAS links
-          var links = {};
-          console.log(payment);
-          payment.links.forEach(function(linkObj){
-              links[linkObj.rel] = {
-                  'href': linkObj.href,
-                  'method': linkObj.method
-              };
-          })
-      
-          //if redirect url present, redirect user
-          if (links.hasOwnProperty('approval_url')){
-              //res.redirect(links['approval_url'].href);
-              
-              res.status(200).send({"paypal_link" : links['approval_url'].href});
-          } else {
-              console.error('no redirect URI present');
-          }
-      }
-  });
-});
-
-*/
-
 router.get('/process', function(req, res){
   var paymentId = req.query.paymentId;
   console.log(req.query);
@@ -371,7 +314,6 @@ router.get('/process', function(req, res){
             conn.query("UPDATE heroku_e12b52604cab367.ventasmaster SET claveCompradorPaypal = '"+claveCompradorPaypal+"', estadoPaypal = '"+estadoPaypal+"' WHERE claveTransaccionPaypal = '"+paymentId+"' ;", (err, result) =>{
               //res.json(result);
              });
-
               //res.send('payment completed successfully');
               res.redirect('http://localhost:3001/paypal-page');
           } else {
@@ -393,6 +335,14 @@ router.get('/prueba', ()=> {
 
 });
 
+router.get('/download/:archivo', (req, res, next)=>{
+  const{ archivo } = req.params;
+  res.download(__dirname+'../../manuales/'+archivo, (err)=>{
+      if (err) {
+        console.log(err);
+      }
+  });
+});
 
 router.get('/cancel', ()=> res.send('cancelado'));
 

@@ -28,11 +28,12 @@ router.get('/NewProduct',verifyUser, function(req, res, next) {
 const upload = multer({ storage:storage });
 router.post('/' , upload.array('archivos',2) ,(req, res) => {
   try {
-    req.body.imagen = req.files[1].filename
-    const {title, imagen, descripcion, precio, autor, tecnologia} = req.body;
+    req.body.archivo = req.files[0].filename;
+    req.body.imagen = req.files[1].filename;
+    req.body.estatus = 'Disponible';
+    const {title, imagen, descripcion, precio, autor, tecnologia, archivo, estatus} = req.body;
     if(title && imagen && descripcion && precio && autor && tecnologia){
       conn.query("INSERT INTO heroku_e12b52604cab367.productos (ID, titulo, imagen, descripcion, precio, autor, tecnologia) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"', '"+autor+"', '"+tecnologia+"');", (err, result)=>{
-        console.log(result.insertId);
         res.redirect('/');
       });
     }else{JSAlert.alert("Nel", "Files Saved", "Got it");}
@@ -41,13 +42,16 @@ router.post('/' , upload.array('archivos',2) ,(req, res) => {
   }
 });
 
-router.post('/update/:id',(req, res) => {
+router.post('/update/:id', upload.array('archivos', 2) , (req, res) => {
   try {
     const { id } = req.params;
-    const { title, imagen, descripcion, precio, autor, tecnologia} = req.body;
-    if(imagen !== undefined){
+    req.body.archivo = req.files[0].filename;
+    req.body.imagen = req.files[1].filename;
+    req.body.estatus = 'Disponible';
+    const { title, imagen, descripcion, precio, autor, tecnologia, archivo, estatus} = req.body;
+    if(imagen !== undefined && archivo !== undefined){
       if(title && imagen && descripcion && precio && id && autor && tecnologia){
-        conn.query("UPDATE heroku_e12b52604cab367.productos SET titulo = '"+title+"', imagen = '"+imagen+"', descripcion = '"+descripcion+"', precio = '"+precio+"', autor = '"+autor+"', tecnologia = '"+tecnologia+"' WHERE ID = '"+id+"';", (err, result)=>{
+        conn.query("UPDATE heroku_e12b52604cab367.productos SET titulo = '"+title+"', imagen = '"+imagen+"', descripcion = '"+descripcion+"', precio = '"+precio+"', autor = '"+autor+"', tecnologia = '"+tecnologia+"', archivo = '"+archivo+"', estatus = '"+estatus+"' WHERE ID = '"+id+"';", (err, result)=>{
           res.redirect('/');
         });
       }else{res.status(500).send()}

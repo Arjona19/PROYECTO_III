@@ -19,7 +19,7 @@ app.use(session({
 //-------------- paypay
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
-
+app.locals.moment = require('moment');
 app.set('port', process.env.PORT || 3000);
 app.set('json spaces', 2);
 // view engine setup

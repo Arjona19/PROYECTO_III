@@ -8,6 +8,9 @@ const { isNullOrUndefined } = require('util');
 router.get('/', verifyExistUser, function(req, res, next) {
     res.render('login');
   });
+
+router.get('/logout', cerrarSession);
+
 router.post("/", (req, res, next)=>{
     try {
       const { username, password } = req.body;
@@ -33,8 +36,12 @@ router.post("/", (req, res, next)=>{
 
 module.exports = router;
 
+function cerrarSession(req, res, next){
+  req.session.destroy();
+  return res.redirect('/login');
+}
   
-  function verifyExistUser(req, res, next) {
+function verifyExistUser(req, res, next) {
     if (req.session && req.session.user && req.session.admin)
         return res.redirect('/');
     else

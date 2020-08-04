@@ -1,5 +1,124 @@
 <%- include ../layouts/header.ejs %>
     <div class="content-wrapper">
-        
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Todas la ventas</h4>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-info icon-btn dropdown-toggle" id="dropdownMenuIconButton8" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="mdi mdi-filter"></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuIconButton8">
+                      <h6 class="dropdown-header">Filtrar por:</h6>
+                      <a class="dropdown-item" href="/ventas/getDaySales">Ventas de hoy</a>
+                      <a class="dropdown-item" href="/ventas/getMonthSales">Del mes</a>
+                      <a class="dropdown-item" href="/ventas/getYearSales">Del año</a>
+                    </div>
+                  </div>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th> Comprador </th>
+                      <th> Fecha </th>
+                      <th> Clave Transaccion  </th>
+                      <th> Total </th>
+                      <th> Estado </th>
+                      <th> Producto  </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <% for(var i =0; i < data.length; i++){ %>
+                    <tr>
+                        <td> 
+                            <button type="button"  data-toggle="modal" data-target="#userModal_<%=i%>" data-toggle="tooltip" data-placement="bottom" title="VER INFORMACION DEL COMPRADOR" class="btn btn-icons btn-rounded btn-outline-info">
+                                <i class="mdi mdi-account-circle-outline"></i>
+                            </button>      
+                        </td>
+                        <td>  <%=  moment(data[i].fecha).format('DD-MM-YYYY'); %> </td>
+                        <td>  <%= data[i].claveTransaccionPaypal %></td>
+                        <td>  <%= data[i].total %> </td>
+                        <td> 
+                            <span class="badge badge-pill badge-info">
+                                <%= data[i].estadoPaypal %>
+                            </span>
+                        </td>
+                        <td> 
+                            <button type="button" data-toggle="modal" data-target="#productModal_<%=i%>" data-placement="bottom" data-toggle="tooltip" title="VER PRODUCTOS" class="btn btn-icons btn-rounded btn-outline-info">
+                                <i class="mdi mdi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <!-- Modal informacion de usuario -->
+                    <div class="modal fade" id="userModal_<%=i%>" >
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Informacion del comprador</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <form>
+                                <div class="form-group">
+                                  <label for="recipient-name" class="col-form-label">Nombre:</label>
+                                  <input type="text" disabled class="form-control" value="<%= data[i].name %>" id="recipient-name">
+                                </div>
+                                <div class="form-group">
+                                  <label for="recipient-name" class="col-form-label">Correo:</label>
+                                  <input type="text" disabled class="form-control" value="<%= data[i].email %>" id="recipient-name">
+                                </div>
+                                <div class="form-group">
+                                  <label for="recipient-name" class="col-form-label">Telefono:</label>
+                                  <input type="text" disabled class="form-control" value="<%= data[i].phone %>" id="recipient-name">
+                                </div>
+                              </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Modal Producto -->
+                      <div class="modal fade" id="productModal_<%=i%>" >
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Producto comprado</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <form>
+                                <div class="form-group">
+                                  <label for="recipient-name" class="col-form-label">Titulo:</label>
+                                  <input type="text" disabled class="form-control" value="<%= data[i].titulo %>" id="recipient-name">
+                                </div>
+                                <div class="form-group">
+                                  <label for="recipient-name" class="col-form-label">Autor:</label>
+                                  <input type="text" disabled class="form-control" value="<%= data[i].autor %>" id="recipient-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Descripcion:</label>
+                                    <textarea disabled class="form-control" id="message-text">
+                                        <%= data[i].descripcion %>
+                                    </textarea>
+                                  </div>
+                              </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
     </div>
 <%- include ../layouts/footer.ejs %>
