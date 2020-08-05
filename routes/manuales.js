@@ -28,12 +28,12 @@ router.get('/NewProduct',verifyUser, function(req, res, next) {
 const upload = multer({ storage:storage });
 router.post('/' , upload.array('archivos',2) ,(req, res) => {
   try {
-    req.body.archivo = req.files[0].filename;
-    req.body.imagen = req.files[1].filename;
+    req.body.imagen = req.files[0].filename;
+    req.body.archivo = req.files[1].filename;
     req.body.estatus = 'Disponible';
     const {title, imagen, descripcion, precio, autor, tecnologia, archivo, estatus} = req.body;
     if(title && imagen && descripcion && precio && autor && tecnologia){
-      conn.query("INSERT INTO heroku_e12b52604cab367.productos (ID, titulo, imagen, descripcion, precio, autor, tecnologia) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"', '"+autor+"', '"+tecnologia+"');", (err, result)=>{
+      conn.query("INSERT INTO heroku_e12b52604cab367.productos (ID, titulo, imagen, descripcion, precio, autor, tecnologia, archivo, estatus) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"', '"+autor+"', '"+tecnologia+"', '"+archivo+"', '"+estatus+"');", (err, result)=>{
         res.redirect('/');
       });
     }else{JSAlert.alert("Nel", "Files Saved", "Got it");}
