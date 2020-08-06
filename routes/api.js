@@ -126,6 +126,18 @@ router.get('/' ,function(req, res, next) {
  }
 });
 
+router.get('/mostsales' ,function(req, res, next) {
+  try {
+   conn.query("SELECT COUNT(*) AS 'unidadesVendidas' , P.* FROM heroku_e12b52604cab367.detallesventa DV "+
+   "INNER JOIN heroku_e12b52604cab367.productos P ON DV.productoId = P.ID " +
+   "GROUP BY DV.productoId", (err, result) =>{
+     res.json(result);
+   });
+  } catch (error) {
+     res.status(500).send(error);
+  }
+ });
+
 router.get('/producto/:id', function(req, res, next) {
   try {
     const {id} = req.params;
