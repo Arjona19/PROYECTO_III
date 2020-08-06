@@ -12,12 +12,11 @@
                     <input type="text" name="title" class="form-control" id="inputEmail4">
                   </div>
                   <div class="form-group col-md-6">
-                    <label for="inputZip">Selecciona la portada y el archivo zip</label>
-                    <input type="file" id="file" multiple name="archivos" style="display:none;" />
-                    <button id="inputZip" onclick="thisFileUpload();" type="button" class="btn btn-outline-info btn-fw form-control">                    
-                        <i class="mdi mdi-upload"></i>
-                        Upload
-                    </button>
+                    <label for="inputFile">Seleccione la portada</label>
+                    <div id="inputFile" class="custom-file">
+                      <input type="file" name="imagen" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                      <label class="custom-file-label" required for="inputGroupFile01">Choose file</label>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group">
@@ -29,13 +28,21 @@
                     <label for="inputCity">Precio</label>
                     <input type="number" name="precio" min="0" type="text" class="form-control" id="inputCity">
                   </div>
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-3">
                     <label for="inputCity">Autor</label>
                     <input type="text" name="autor" class="form-control" id="inputCity">
                   </div>
                   <div class="form-group col-md-3">
                     <label for="inputCity">Tecnologia</label>
                     <input type="text" name="tecnologia" class="form-control" id="inputCity">
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="inputCity">Zip</label>
+                    <input type="file" id="file" required name="zip" style="display:none;" />
+                    <button id="inputZip" onclick="thisFileUpload();" type="button" class="btn btn-outline-info btn-fw form-control">                    
+                        <i class="mdi mdi-upload"></i>
+                        Upload
+                    </button>
                   </div>
                 </div>
                 <button type="submit" class="btn btn-success">Agregar</button>

@@ -186,7 +186,7 @@ router.delete('/:id', verifyToken ,(req, res) => {
 router.put('/:id',verifyToken ,(req, res) => {
   try {
     const { id } = req.params;
-    const { title, imagen, descripcion, precio, autor, tecnologia} = req.body;
+    const { title, imagen, descripcion, precio, autor, tecnologia } = req.body;
     if(title && imagen && descripcion && precio && id && autor && tecnologia){
       conn.query("UPDATE heroku_e12b52604cab367.productos SET titulo = '"+title+"', imagen = '"+imagen+"', descripcion = '"+descripcion+"', precio = '"+precio+"', autor = '"+autor+"', tecnologia = '"+tecnologia+"' WHERE ID = '"+id+"';", (err, result)=>{
         res.status(200).send(result);
