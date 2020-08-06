@@ -62,19 +62,27 @@ router.post('/register', verifyExistUser, (req, res) => {
     }
   });
 
-  router.put('user/:iduser' ,(req, res) => {
+  router.post('/userupdate' ,function (req, res, next) {
+
+    console.log(req.body);
+    
     try {
-      const { iduser } = req.params;
-      const { username, name, email, phone} = req.body;
-      if(username && name && email && phone){
-        console.log('d');
-        conn.query("UPDATE users SET username = '"+username+"', name = '"+name+"', email = '"+email+"', phone = '"+phone+"' WHERE iduser = '"+iduser+"';", (err, result)=>{
+      //const { iduser } = req.params;
+      const { username, name, email, phone, iduser} = req.body;
+
+      
+      console.log(iduser);
+      if(username && name && email && phone && iduser){
+        
+        conn.query("UPDATE heroku_e12b52604cab367.users SET username = '"+username+"', name = '"+name+"', email = '"+email+"', phone = '"+phone+"' WHERE iduser = '"+iduser+"' ;", (err, result)=>{
           res.status(200).send(result);
         });
+
       }else{res.status(500).send()}
     } catch (error) {
       res.status(500).send(error)
     }
+    
   });
   
 
