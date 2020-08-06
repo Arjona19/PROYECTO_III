@@ -37,9 +37,9 @@ router.post('/', uploadInsert ,(req, res) => {
     req.body.archivo = files.zip[0].originalname;
     req.body.estatus = 'Disponible';
     console.log(req.body);
-    const {title, imagen, descripcion, precio, autor, tecnologia, archivo, estatus} = req.body;
+    const {title, imagen, descripcion, precio, autor, tecnologia, archivo, estatus, preview} = req.body;
     if(title && imagen && descripcion && precio && autor && tecnologia){
-      conn.query("INSERT INTO heroku_e12b52604cab367.productos (ID, titulo, imagen, descripcion, precio, autor, tecnologia, archivo, estatus) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"', '"+autor+"', '"+tecnologia+"', '"+archivo+"', '"+estatus+"');", (err, result)=>{
+      conn.query("INSERT INTO heroku_e12b52604cab367.productos (ID, titulo, imagen, descripcion, precio, autor, tecnologia, archivo, estatus, preview) VALUES (NULL, '"+title+"', '"+imagen+"', '"+descripcion+"', '"+precio+"', '"+autor+"', '"+tecnologia+"', '"+archivo+"', '"+estatus+"', '"+preview+"');", (err, result)=>{
         res.redirect('/');
       });
     }else{JSAlert.alert("Nel", "Files Saved", "Got it");}
@@ -57,8 +57,8 @@ router.post('/update/:id', uploadUpdate, (req, res, next) => {
     req.body.imagen = files.imagen[0].originalname;
     req.body.archivo = files.zip[0].originalname;
     req.body.estatus = 'Disponible';
-    const { title, descripcion, precio, autor, tecnologia, estatus, imagen, archivo} = req.body;
-    conn.query("UPDATE productos SET titulo = '"+title+"', descripcion = '"+descripcion+"', precio = '"+precio+"', autor = '"+autor+"', tecnologia = '"+tecnologia+"', estatus = '"+estatus+"', imagen = '"+imagen+"', archivo = '"+archivo+"' WHERE ID = '"+req.params.id+"';", (err, result)=>{
+    const { title, descripcion, precio, autor, tecnologia, estatus, imagen, archivo, preview} = req.body;
+    conn.query("UPDATE productos SET titulo = '"+title+"', descripcion = '"+descripcion+"', precio = '"+precio+"', autor = '"+autor+"', tecnologia = '"+tecnologia+"', estatus = '"+estatus+"', imagen = '"+imagen+"', archivo = '"+archivo+"', preview = '"+preview+"' WHERE ID = '"+req.params.id+"';", (err, result)=>{
       res.redirect('/');
     });
 });
