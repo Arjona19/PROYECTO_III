@@ -20,7 +20,7 @@ app.use(session({
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.locals.moment = require('moment');
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 5000);
 app.set('json spaces', 2);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
